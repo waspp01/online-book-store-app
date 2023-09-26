@@ -1,7 +1,7 @@
 package com.example.onlinebookstore.dto.user;
 
 import com.example.onlinebookstore.lib.FieldsValueMatch;
-import com.example.onlinebookstore.lib.ValidEmail;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -13,7 +13,7 @@ import lombok.Data;
 )
 @Data
 public class UserRegistrationRequestDto {
-    @ValidEmail
+    @Email
     @NotBlank
     @Size(min = 6, max = 50)
     private String email;
