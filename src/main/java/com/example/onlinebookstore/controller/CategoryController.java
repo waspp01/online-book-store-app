@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +37,7 @@ public class CategoryController {
     @Operation(summary = "Get all categories", description = "Get a list of all categories")
     @ApiResponse(responseCode = "200", description = "All categories",
             content = {@Content(mediaType = "application/json")})
-    public List<CategoryDto> getAll(Authentication authentication, Pageable pageable) {
+    public List<CategoryDto> getAll(Pageable pageable) {
         return categoryService.findAll();
     }
 
@@ -46,8 +45,7 @@ public class CategoryController {
     @Operation(summary = "Get books by category", description = "Books by category")
     @ApiResponse(responseCode = "200", description = "Books by category",
             content = {@Content(mediaType = "application/json")})
-    public List<BookDtoWithoutCategoryIds> getBookByCategory(Authentication authentication,
-                                                             Pageable pageable,
+    public List<BookDtoWithoutCategoryIds> getBookByCategory(Pageable pageable,
                                                              @PathVariable Long id) {
         return bookService.findAllByCategoryId(id);
     }
@@ -56,8 +54,7 @@ public class CategoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new category", description = "Create a new category")
-    public CategoryDto createCategory(Authentication authentication,
-                                      @RequestBody @Valid CreateCategoryRequestDto requestDto) {
+    public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequestDto requestDto) {
         return categoryService.save(requestDto);
     }
 
@@ -65,7 +62,7 @@ public class CategoryController {
     @Operation(summary = "Get a category by id", description = "Category by id")
     @ApiResponse(responseCode = "200", description = "Category by id",
             content = {@Content(mediaType = "application/json")})
-    public CategoryDto getCategoryById(Authentication authentication, @PathVariable Long id) {
+    public CategoryDto getCategoryById(@PathVariable Long id) {
         return categoryService.getById(id);
     }
 
@@ -74,8 +71,7 @@ public class CategoryController {
     @Operation(summary = "Update a category by id", description = "Update a category by id")
     @ApiResponse(responseCode = "200", description = "Update a category",
             content = {@Content(mediaType = "application/json")})
-    public CategoryDto updateCategory(Authentication authentication,
-            @PathVariable Long id,
+    public CategoryDto updateCategory(@PathVariable Long id,
             @RequestBody CreateCategoryRequestDto categoryRequestDto) {
         return categoryService.update(id, categoryRequestDto);
     }
@@ -84,8 +80,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a category by id", description = "Delete a category by id")
-    public void deleteCategory(Authentication authentication,
-                               @PathVariable Long id) {
+    public void deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
     }
 }

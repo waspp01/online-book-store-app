@@ -6,14 +6,12 @@ import com.example.onlinebookstore.dto.book.BookSearchParameters;
 import com.example.onlinebookstore.dto.book.CreateBookRequestDto;
 import com.example.onlinebookstore.mapper.BookMapper;
 import com.example.onlinebookstore.model.Book;
-import com.example.onlinebookstore.model.Category;
 import com.example.onlinebookstore.repository.book.BookRepository;
 import com.example.onlinebookstore.repository.book.BookSpecificationBuilder;
 import com.example.onlinebookstore.repository.category.CategoryRepository;
 import com.example.onlinebookstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,9 +27,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
-        Set<Category> categories = categoryRepository.findByIdIn(requestDto.getCategoryIds());
         Book book = bookMapper.toModel(requestDto);
-        book.setCategories(categories);
         return bookMapper.toDto(bookRepository.save(book));
     }
 
@@ -55,9 +51,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto update(Long id, CreateBookRequestDto requestDto) {
-        Set<Category> categories = categoryRepository.findByIdIn(requestDto.getCategoryIds());
         Book book = bookMapper.toModel(requestDto);
-        book.setCategories(categories);
         book.setId(id);
         return bookMapper.toDto(bookRepository.save(book));
     }

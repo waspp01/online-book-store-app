@@ -36,8 +36,7 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @Operation(summary = "Create a new book", description = "Create a new book")
-    public BookDto createBook(Authentication authentication,
-                              @RequestBody @Valid CreateBookRequestDto bookDto) {
+    public BookDto createBook(@RequestBody @Valid CreateBookRequestDto bookDto) {
         return bookService.save(bookDto);
     }
 
@@ -45,7 +44,7 @@ public class BookController {
     @Operation(summary = "Get all books", description = "Get the catalogue of all books")
     @ApiResponse(responseCode = "200", description = "All books",
             content = {@Content(mediaType = "application/json")})
-    public List<BookDto> getAll(Authentication authentication, Pageable pageable) {
+    public List<BookDto> getAll(Pageable pageable) {
         return bookService.findAll(pageable);
     }
 
@@ -53,7 +52,7 @@ public class BookController {
     @Operation(summary = "Get a book by id", description = "Get a book by id")
     @ApiResponse(responseCode = "200", description = "Book by id",
             content = {@Content(mediaType = "application/json")})
-    public BookDto getBookById(Authentication authentication, @PathVariable Long id) {
+    public BookDto getBookById(@PathVariable Long id) {
         return bookService.findById(id);
     }
 
@@ -71,7 +70,7 @@ public class BookController {
             description = "Update a book by id with given parameters")
     @ApiResponse(responseCode = "200", description = "Updated",
             content = {@Content(mediaType = "application/json")})
-    public BookDto updateById(Authentication authentication, @PathVariable Long id,
+    public BookDto updateById(@PathVariable Long id,
                               @RequestBody @Valid CreateBookRequestDto bookDto) {
         return bookService.update(id, bookDto);
     }
@@ -79,8 +78,7 @@ public class BookController {
     @GetMapping("/search")
     @Operation(summary = "Search a book by parameters",
             description = "Search a book by author or title")
-    public List<BookDto> searchBooks(Authentication authentication,
-                                     Pageable pageable,
+    public List<BookDto> searchBooks(Pageable pageable,
                                      BookSearchParameters searchParameters) {
         return bookService.search(searchParameters);
     }
