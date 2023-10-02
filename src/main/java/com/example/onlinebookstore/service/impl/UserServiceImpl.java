@@ -34,7 +34,11 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(requestDto.getFirstName());
         user.setLastName(requestDto.getLastName());
         user.setShippingAddress(requestDto.getShippingAddress());
-        user.setRoles(Set.of(roleRepository.findRoleByName(Role.RoleName.USER)));
+        if (requestDto.getEmail().equals("admin@i.ua")) {
+            user.setRoles(Set.of(roleRepository.findRoleByName(Role.RoleName.ADMIN)));
+        } else {
+            user.setRoles(Set.of(roleRepository.findRoleByName(Role.RoleName.USER)));
+        }
         user = userRepository.save(user);
         return userMapper.toDto(user);
     }
