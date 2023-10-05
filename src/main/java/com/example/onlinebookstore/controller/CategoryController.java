@@ -38,7 +38,7 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "All categories",
             content = {@Content(mediaType = "application/json")})
     public List<CategoryDto> getAll(Pageable pageable) {
-        return categoryService.findAll();
+        return categoryService.findAll(pageable);
     }
 
     @GetMapping("/{id}/books")
@@ -47,7 +47,7 @@ public class CategoryController {
             content = {@Content(mediaType = "application/json")})
     public List<BookDtoWithoutCategoryIds> getBookByCategory(Pageable pageable,
                                                              @PathVariable Long id) {
-        return bookService.findAllByCategoryId(id);
+        return bookService.findAllByCategoriesId(id, pageable);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
