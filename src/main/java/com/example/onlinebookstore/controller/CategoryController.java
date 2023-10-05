@@ -72,7 +72,7 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "Update a category",
             content = {@Content(mediaType = "application/json")})
     public CategoryDto updateCategory(@PathVariable Long id,
-            @RequestBody CreateCategoryRequestDto categoryRequestDto) {
+            @RequestBody @Valid CreateCategoryRequestDto categoryRequestDto) {
         return categoryService.update(id, categoryRequestDto);
     }
 
