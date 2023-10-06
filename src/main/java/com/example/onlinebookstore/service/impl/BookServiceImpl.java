@@ -1,6 +1,7 @@
 package com.example.onlinebookstore.service.impl;
 
 import com.example.onlinebookstore.dto.book.BookDto;
+import com.example.onlinebookstore.dto.book.BookDtoWithoutCategoryIds;
 import com.example.onlinebookstore.dto.book.BookSearchParameters;
 import com.example.onlinebookstore.dto.book.CreateBookRequestDto;
 import com.example.onlinebookstore.mapper.BookMapper;
@@ -24,8 +25,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
-        return bookMapper.toDto(
-                bookRepository.save(bookMapper.toModel(requestDto)));
+        Book book = bookMapper.toModel(requestDto);
+        return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Override
@@ -47,17 +48,24 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto update(Long id, CreateBookRequestDto createBookRequestDto) {
-        Book book = bookMapper.toModel(createBookRequestDto);
+    public BookDto update(Long id, CreateBookRequestDto requestDto) {
+        Book book = bookMapper.toModel(requestDto);
         book.setId(id);
         return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Override
-    public List<BookDto> search(BookSearchParameters searchParameters) {
+    public List<BookDto> search(BookSearchParameters searchParameters, Pageable pageable) {
         Specification<Book> specification = bookSpecificationBuilder.build(searchParameters);
-        return bookRepository.findAll(specification).stream()
+        return bookRepository.findAll(specification, pageable).stream()
                 .map(bookMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> findAllByCategoriesId(Long id, Pageable pageable) {
+        return bookRepository.findAllByCategoriesId(id, pageable).stream()
+                .map(bookMapper::toDtoWithoutCategories)
                 .toList();
     }
 }
