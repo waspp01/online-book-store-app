@@ -5,8 +5,10 @@ import com.example.onlinebookstore.dto.cartitem.UpdateCartItemRequestDto;
 import com.example.onlinebookstore.dto.shoppingcart.ShoppingCartDto;
 import com.example.onlinebookstore.mapper.CartItemMapper;
 import com.example.onlinebookstore.mapper.ShoppingCartMapper;
+import com.example.onlinebookstore.model.Book;
 import com.example.onlinebookstore.model.CartItem;
 import com.example.onlinebookstore.model.ShoppingCart;
+import com.example.onlinebookstore.repository.book.BookRepository;
 import com.example.onlinebookstore.repository.cartitem.CartItemRepository;
 import com.example.onlinebookstore.repository.shoppingcart.ShoppingCartRepository;
 import com.example.onlinebookstore.service.ShoppingCartService;
@@ -22,22 +24,31 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final CartItemRepository cartItemRepository;
     private final ShoppingCartMapper shoppingCartMapper;
     private final CartItemMapper cartItemMapper;
+    private final BookRepository bookRepository;
 
     @Override
     public ShoppingCartDto addCartItem(Long userId,
                                    CreateCartItemRequestDto requestDto) {
         ShoppingCart shoppingCart = getShoppingCartById(userId);
-        List<CartItem> cartItems = shoppingCart.getCartItems();
-        for (CartItem c : cartItems) {
-            if (c.getBook().getId().equals(requestDto.getBookId())) {
-                throw new RuntimeException(
-                        "You already gave this book in your cart " + c.getBook().getTitle());
-            }
-        }
+
+        duplicateCheck(shoppingCart, requestDto);
+
+        Book book = bookRepository.findById(requestDto
+                .getBookId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find the book by ID " + requestDto.getBookId()));
+
         CartItem cartItem = cartItemMapper.toModel(requestDto);
+        cartItem.setBook(book);
         cartItem.setShoppingCart(shoppingCart);
         cartItemRepository.save(cartItem);
-        return shoppingCartMapper.toDto(getShoppingCartById(userId));
+
+        List<CartItem> cartItems = shoppingCart.getCartItems();
+        cartItems.add(cartItem);
+        shoppingCart.setCartItems(cartItems);
+
+        ShoppingCartDto shoppingCartDto = shoppingCartMapper.toDto(shoppingCart);
+        return shoppingCartDto;
     }
 
     @Override
@@ -68,5 +79,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(
                         "Can't find shopping card by user userId " + userId));
+    }
+
+    private boolean duplicateCheck(ShoppingCart shoppingCart,
+                                   CreateCartItemRequestDto requestDto) {
+        List<CartItem> cartItems = shoppingCart.getCartItems();
+        for (CartItem c : cartItems) {
+            if (c.getBook().getId().equals(requestDto.getBookId())) {
+                throw new RuntimeException(
+                        "You already gave this book in your cart " + c.getBook().getTitle());
+            }
+        }
+        return true;
     }
 }
