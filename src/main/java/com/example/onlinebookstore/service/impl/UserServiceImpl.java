@@ -5,8 +5,10 @@ import com.example.onlinebookstore.dto.user.UserResponseDto;
 import com.example.onlinebookstore.exception.RegistrationException;
 import com.example.onlinebookstore.mapper.UserMapper;
 import com.example.onlinebookstore.model.Role;
+import com.example.onlinebookstore.model.ShoppingCart;
 import com.example.onlinebookstore.model.User;
 import com.example.onlinebookstore.repository.role.RoleRepository;
+import com.example.onlinebookstore.repository.shoppingcart.ShoppingCartRepository;
 import com.example.onlinebookstore.repository.user.UserRepository;
 import com.example.onlinebookstore.service.UserService;
 import java.util.Set;
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -36,6 +39,10 @@ public class UserServiceImpl implements UserService {
         user.setShippingAddress(requestDto.getShippingAddress());
         user.setRoles(Set.of(roleRepository.findRoleByName(Role.RoleName.USER)));
         user = userRepository.save(user);
+
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        shoppingCartRepository.save(shoppingCart);
         return userMapper.toDto(user);
     }
 }
