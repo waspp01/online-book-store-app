@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -46,9 +47,9 @@ public class OrderController {
             description = "Get all info about the orders")
     @ApiResponse(responseCode = "200", description = "Order information",
             content = {@Content(mediaType = "application/json")})
-    public List<OrderDto> getAll(Authentication authentication) {
+    public List<OrderDto> getAll(Authentication authentication, Pageable pageable) {
         User user = (User) authentication.getPrincipal();
-        return orderService.getAll(user.getId());
+        return orderService.getAll(user.getId(), pageable);
     }
 
     @PutMapping("/{id}")
@@ -68,7 +69,8 @@ public class OrderController {
     @ApiResponse(responseCode = "200", description = "Order information",
             content = {@Content(mediaType = "application/json")})
     public List<OrderItemDto> getAllItemsById(Authentication authentication,
-                                              @PathVariable Long id) {
+                                              @PathVariable Long id,
+                                              Pageable pageable) {
         User user = (User) authentication.getPrincipal();
         return orderService.getAllItemsById(id, user.getId());
     }

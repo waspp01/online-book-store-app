@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/changes/09-create-orders-table.yaml
   - include:
       file: db/changelog/changes/10-create-order_items-table.yaml
+  - include:
+      file: db/changelog/changes/11-add-is_deleted-column-to-order_items-table.yaml
