@@ -60,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toDto(saved);
     }
 
+    @Transactional
     @Override
     public List<OrderDto> getAll(Long userId, Pageable pageable) {
         return orderRepository.findAllByUserId(userId, pageable).stream()
