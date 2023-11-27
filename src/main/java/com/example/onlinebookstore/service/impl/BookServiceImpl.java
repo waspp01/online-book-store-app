@@ -10,6 +10,7 @@ import com.example.onlinebookstore.repository.book.BookRepository;
 import com.example.onlinebookstore.repository.book.BookSpecificationBuilder;
 import com.example.onlinebookstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public List<BookDto> findAll(Pageable pageable) {
         return bookRepository.findAll(pageable).stream()
                 .map(bookMapper::toDto).toList();

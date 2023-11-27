@@ -11,6 +11,7 @@ import com.example.onlinebookstore.repository.role.RoleRepository;
 import com.example.onlinebookstore.repository.shoppingcart.ShoppingCartRepository;
 import com.example.onlinebookstore.repository.user.UserRepository;
 import com.example.onlinebookstore.service.UserService;
+import jakarta.transaction.Transactional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
+    @Transactional
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
             throws RegistrationException {
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
