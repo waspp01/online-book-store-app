@@ -1,5 +1,10 @@
 package com.example.onlinebookstore.service;
 
+import static com.example.onlinebookstore.util.category.TestCategorySupplier.getCategoryDtoFromCategory;
+import static com.example.onlinebookstore.util.category.TestCategorySupplier.getCategoryFromCreateCategoryDto;
+import static com.example.onlinebookstore.util.category.TestCategorySupplier.getTestCategory;
+import static com.example.onlinebookstore.util.category.TestCategorySupplier.getTestCreateCategoryRequestDto;
+
 import com.example.onlinebookstore.dto.category.CategoryDto;
 import com.example.onlinebookstore.dto.category.CreateCategoryRequestDto;
 import com.example.onlinebookstore.mapper.CategoryMapper;
@@ -24,12 +29,12 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
-    @InjectMocks
-    private CategoryServiceImpl categoryService;
     @Mock
     private CategoryRepository categoryRepository;
     @Mock
     private CategoryMapper categoryMapper;
+    @InjectMocks
+    private CategoryServiceImpl categoryService;
 
     @Test
     @DisplayName("""
@@ -99,7 +104,7 @@ public class CategoryServiceImplTest {
         CategoryDto actual = categoryService.getById(category.getId());
 
         //then
-        Assertions.assertEquals(expected,actual);
+        Assertions.assertEquals(expected, actual);
         Mockito.verify(categoryRepository, Mockito.times(1)).findById(Mockito.anyLong());
         Mockito.verify(categoryMapper, Mockito.times(1)).toDto(Mockito.any());
         Mockito.verifyNoMoreInteractions(categoryRepository, categoryMapper);
@@ -117,8 +122,7 @@ public class CategoryServiceImplTest {
         //when
         Exception exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
-                () -> categoryService.getById(id)
-        );
+                () -> categoryService.getById(id));
 
         //then
         String expected = "Can't find category by id " + id;
@@ -163,37 +167,5 @@ public class CategoryServiceImplTest {
             """)
     void deleteById_ValidId_DoesNotThrowException() {
         Assertions.assertDoesNotThrow(() -> categoryService.deleteById(Mockito.anyLong()));
-    }
-
-    private CreateCategoryRequestDto getTestCreateCategoryRequestDto() {
-        CreateCategoryRequestDto createCategoryRequestDto =
-                new CreateCategoryRequestDto();
-        createCategoryRequestDto.setName("TestName1");
-        createCategoryRequestDto.setDescription("TestDescription1");
-        return createCategoryRequestDto;
-    }
-
-    private Category getTestCategory() {
-        Category category = new Category();
-        category.setName("TestName1");
-        category.setDescription("TestDescription1");
-        category.setId(1L);
-        return category;
-    }
-
-    private CategoryDto getCategoryDtoFromCategory(Category category) {
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setName(category.getName());
-        categoryDto.setDescription(category.getDescription());
-        return categoryDto;
-    }
-
-    private Category getCategoryFromCreateCategoryDto(
-            CreateCategoryRequestDto createCategoryRequestDto) {
-        Category category = new Category();
-        category.setName(createCategoryRequestDto.getName());
-        category.setDescription(createCategoryRequestDto.getDescription());
-        return category;
     }
 }

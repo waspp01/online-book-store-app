@@ -1,5 +1,11 @@
 package com.example.onlinebookstore.service;
 
+import static com.example.onlinebookstore.util.book.TestBookSupplier.getBookDtoFromBook;
+import static com.example.onlinebookstore.util.book.TestBookSupplier.getBookDtoWithoutCategoryIdsFromBook;
+import static com.example.onlinebookstore.util.book.TestBookSupplier.getBookFromCreateBookRequestDto;
+import static com.example.onlinebookstore.util.book.TestBookSupplier.getTestBook;
+import static com.example.onlinebookstore.util.book.TestBookSupplier.getTestCreateBookRequestDto;
+import static com.example.onlinebookstore.util.category.TestCategorySupplier.getTestCategory;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,11 +26,8 @@ import com.example.onlinebookstore.repository.book.BookRepository;
 import com.example.onlinebookstore.repository.book.BookSpecificationBuilder;
 import com.example.onlinebookstore.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,14 +42,14 @@ import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceImplTest {
-    @InjectMocks
-    private BookServiceImpl bookServiceImpl;
     @Mock
     private BookRepository bookRepository;
     @Mock
     private BookMapper bookMapper;
     @Mock
     private BookSpecificationBuilder bookSpecificationBuilder;
+    @InjectMocks
+    private BookServiceImpl bookServiceImpl;
 
     @Test
     @DisplayName("""
@@ -82,7 +85,7 @@ public class BookServiceImplTest {
         //given
         Book book = getTestBook();
         BookDto expected = getBookDtoFromBook(book);
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
         List<Book> books = List.of(book);
         Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
@@ -132,8 +135,7 @@ public class BookServiceImplTest {
         //when
         Exception exception = assertThrows(
                 EntityNotFoundException.class,
-                () -> bookServiceImpl.findById(id)
-        );
+                () -> bookServiceImpl.findById(id));
 
         //then
         String expected = "Can't find the book by id " + id;
@@ -191,7 +193,7 @@ public class BookServiceImplTest {
         BookSearchParameters bookSearchParameters =
                 new BookSearchParameters(new String[0], new String[0]);
 
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
         List<Book> books = List.of(book);
         Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
 
@@ -219,7 +221,7 @@ public class BookServiceImplTest {
         Category category = getTestCategory();
         Book book = getTestBook();
         BookDtoWithoutCategoryIds expected = getBookDtoWithoutCategoryIdsFromBook(book);
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
         List<Book> books = List.of(book);
         Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
 
@@ -238,78 +240,5 @@ public class BookServiceImplTest {
         verify(bookMapper, times(1))
                 .toDtoWithoutCategories(book);
         verifyNoMoreInteractions(bookRepository, bookMapper);
-    }
-
-    private CreateBookRequestDto getTestCreateBookRequestDto() {
-        CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
-        createBookRequestDto.setTitle("TestBook1");
-        createBookRequestDto.setAuthor("TestAuthor1");
-        createBookRequestDto.setIsbn("TestIsbn1");
-        createBookRequestDto.setPrice(BigDecimal.valueOf(9.99));
-        createBookRequestDto.setDescription("Test Description1");
-        createBookRequestDto.setCoverImage("TestCoverImage");
-        createBookRequestDto.setCategoryIds(Set.of(1L));
-        return createBookRequestDto;
-    }
-
-    private Book getBookFromCreateBookRequestDto(CreateBookRequestDto createBookRequestDto) {
-        Book book = new Book();
-        book.setTitle(createBookRequestDto.getTitle());
-        book.setAuthor(createBookRequestDto.getAuthor());
-        book.setIsbn(createBookRequestDto.getIsbn());
-        book.setPrice(createBookRequestDto.getPrice());
-        book.setDescription(createBookRequestDto.getDescription());
-        book.setCoverImage(createBookRequestDto.getCoverImage());
-        book.setCategories(createBookRequestDto.getCategoryIds().stream()
-                .map(Category::new)
-                .collect(Collectors.toSet()));
-        return book;
-    }
-
-    private BookDto getBookDtoFromBook(Book book) {
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
-        bookDto.setDescription(book.getDescription());
-        bookDto.setCoverImage(book.getCoverImage());
-        bookDto.setCategoryIds(book.getCategories().stream()
-                .map(c -> c.getId())
-                .collect(Collectors.toSet()));
-        return bookDto;
-    }
-
-    private Book getTestBook() {
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("TestBook1");
-        book.setAuthor("TestAuthor1");
-        book.setIsbn("TestIsbn1");
-        book.setPrice(BigDecimal.valueOf(9.99));
-        book.setDescription("Test Description1");
-        book.setCoverImage("TestCoverImage");
-        book.setCategories(Set.of(getTestCategory()));
-        return book;
-    }
-
-    private Category getTestCategory() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Test Name");
-        category.setDescription("Test Description");
-        return category;
-    }
-
-    private BookDtoWithoutCategoryIds getBookDtoWithoutCategoryIdsFromBook(Book book) {
-        BookDtoWithoutCategoryIds dto = new BookDtoWithoutCategoryIds();
-        dto.setId(book.getId());
-        dto.setAuthor(book.getAuthor());
-        dto.setIsbn(book.getIsbn());
-        dto.setTitle(book.getTitle());
-        dto.setDescription(book.getDescription());
-        dto.setCoverImage(book.getCoverImage());
-        dto.setPrice(book.getPrice());
-        return dto;
     }
 }

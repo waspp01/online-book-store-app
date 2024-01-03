@@ -1,4 +1,4 @@
 INSERT INTO books (id, title, author, isbn, price, description, cover_image, is_deleted)
-VALUES (1, 'Title1', 'Author1', 'isbn1', 1.99, 'Description1', 'CoverImage1', false);
+VALUES (1, 'TestBook1', 'TestAuthor1', 'TestIsbn1', 9.99, 'Test Description1', 'TestCoverImage', false);
 INSERT INTO books (id, title, author, isbn, price, description, cover_image, is_deleted)
-VALUES (2, 'Title2', 'Author2', 'isbn2', 10.99, 'Description2', 'CoverImage2', false);
+VALUES (2, 'TestBook2', 'TestAuthor2', 'TestIsbn2', 10.99, 'Test Description2', 'TestCoverImage', false);
