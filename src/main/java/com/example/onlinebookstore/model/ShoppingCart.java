@@ -11,10 +11,12 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
 @Table(name = "shopping_carts")
+@Accessors(chain = true)
 public class ShoppingCart {
     @Id
     private Long id;
