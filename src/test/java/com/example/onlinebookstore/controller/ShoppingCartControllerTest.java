@@ -1,15 +1,15 @@
 package com.example.onlinebookstore.controller;
 
-import static com.example.onlinebookstore.util.cartitem.TestCartItemSupplier.getTestCreateCartItemRequestDto;
 import static com.example.onlinebookstore.util.shoppingcart.TestShoppingCartSupplier.getTestShoppingCartDto;
 import static com.example.onlinebookstore.util.user.TestUserSupplier.getTestUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.onlinebookstore.dto.cartitem.CartItemDto;
@@ -118,14 +118,13 @@ public class ShoppingCartControllerTest {
                         .with(user(user))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(expected.getId().intValue())))
+                .andExpect(jsonPath("$.userId", equalTo(expected.getUserId().intValue())))
+                .andExpect(jsonPath("$.cartItems.size()",
+                        equalTo(expected.getCartItems().size())))
+                .andExpect(jsonPath("$.cartItems[0].id",
+                        equalTo(1)))
                 .andReturn();
-
-        //then
-        ShoppingCartDto actual = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                ShoppingCartDto.class);
-
-        assertEquals(expected, actual);
     }
 
     @Test
@@ -135,7 +134,7 @@ public class ShoppingCartControllerTest {
             """)
     void addCartItem_ValidInput_ReturnsShoppingCartDto() throws Exception {
         //given
-        CreateCartItemRequestDto dto = getTestCreateCartItemRequestDto();
+        CreateCartItemRequestDto dto = new CreateCartItemRequestDto().setBookId(2L).setQuantity(2);
         String jsonRequest = objectMapper.writeValueAsString(dto);
         User user = getTestUser();
         CartItemDto first =
@@ -151,12 +150,13 @@ public class ShoppingCartControllerTest {
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(expected.getId().intValue())))
+                .andExpect(jsonPath("$.userId", equalTo(expected.getUserId().intValue())))
+                .andExpect(jsonPath("$.cartItems.size()",
+                        equalTo(expected.getCartItems().size())))
+                .andExpect(jsonPath("$.cartItems[0].id", equalTo(first.getId().intValue())))
+                .andExpect(jsonPath("$.cartItems[1].id", equalTo(second.getId().intValue())))
                 .andReturn();
-
-        //then
-        ShoppingCartDto actual = objectMapper.readValue(
-                result.getResponse().getContentAsString(), ShoppingCartDto.class);
-        assertEquals(expected, actual);
     }
 
     @Test
@@ -170,10 +170,11 @@ public class ShoppingCartControllerTest {
         UpdateCartItemRequestDto dto = new UpdateCartItemRequestDto().setQuantity(10);
         User user = getTestUser();
         String jsonRequest = objectMapper.writeValueAsString(dto);
-        CartItemDto cartItemDto =
+        CartItemDto expectedCartItemDto =
                 new CartItemDto().setId(1L).setBookId(1L).setBookTitle("TestBook1").setQuantity(10);
         ShoppingCartDto expected =
-                new ShoppingCartDto().setId(1L).setUserId(1L).setCartItems(Set.of(cartItemDto));
+                new ShoppingCartDto()
+                        .setId(1L).setUserId(1L).setCartItems(Set.of(expectedCartItemDto));
 
         //when
         MvcResult result = mockMvc.perform(put("/cart/cart-items/" + id)
@@ -181,12 +182,15 @@ public class ShoppingCartControllerTest {
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(expected.getId().intValue())))
+                .andExpect(jsonPath("$.userId", equalTo(expected.getUserId().intValue())))
+                .andExpect(jsonPath("$.cartItems.size()",
+                        equalTo(expected.getCartItems().size())))
+                .andExpect(jsonPath("$.cartItems[0].id",
+                        equalTo(expectedCartItemDto.getId().intValue())))
+                .andExpect(jsonPath("$.cartItems[0].quantity",
+                        equalTo(expectedCartItemDto.getQuantity())))
                 .andReturn();
-
-        //then
-        ShoppingCartDto actual = objectMapper.readValue(
-                result.getResponse().getContentAsString(), ShoppingCartDto.class);
-        assertEquals(expected, actual);
     }
 
     @Test
