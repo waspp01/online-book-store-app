@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-roles-into-roles-table
+      author: yevhen
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: admin@gmail.com
+              - column:
+                  name: password
+                  value: $2a$10$R8drg/654uUMxYIajMLCief0WtU99T9UaADt4nV0efz0AsPQ8RhYW
+              - column:
+                  name: first_name
+                  value: adminFirstName
+              - column:
+                  name: last_name
+                  value: adminLastName
+              - column:
+                  name: shipping_address
+                  value: shipping_address
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: user@gmail.com
+              - column:
+                  name: password
+                  value: $2a$10$.ptaDfYUp0OFfDDnnb8m8.HrtD530EKux41vyMjwJbE5pHvrXF7Y2
+              - column:
+                  name: first_name
+                  value: userFirstName
+              - column:
+                  name: last_name
+                  value: userLastName
+              - column:
+                  name: shipping_address
+                  value: shipping_address
